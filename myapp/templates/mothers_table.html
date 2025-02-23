@@ -1,0 +1,91 @@
+<!-- mothers_table.html -->
+{% load custom_filters %}
+
+<div class="mother-description">
+    <a href="{% url 'edit_mother' mother.id %}">Upravit údaje o matce</a>
+    {% if mother.active == False %}
+        <a href="{% url 'erase_mother' mother.id %}"
+            onclick="return confirmDelete(1, 'Úplné odstranění záznamů o zrušené mace může mít vliv na sledování rodokmenů.')">
+            Odstranit záznamy o zrušené matce.
+        </a>
+    {% else %}
+        <a href="{% url 'remove_mother' mother.id %}"
+            onclick="return confirmDelete(1, 'Zrušená matka již nebude dostupná. Pokud ji chcete dále používat, přemístěte ji do jiného včelstva.')">
+            Zrušit matku.
+        </a>
+        <div>
+            <form method="post" action="{% url 'move_mother' mother.id %}">
+                {% csrf_token %}
+                <label for="id_new_hive">Vyberte nové včelstvo:</label>
+                {{ form.new_hive }}
+                <button type="submit">Přemístit</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<table class="table basic-table">
+    <tbody>
+        <tr>
+            <td>Matka</td>
+            <td>
+                {{ mother.mark }}
+                {% if mother.active == False %}
+                    (zrušená)
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>Rok</td>
+            <td>{{ mother.year }}</td>
+        </tr>
+        <tr>
+            <td>Stanoviště</td>
+            {% if mother.hive.place.active == True %}
+                <td><a href="{% url 'hives_place' mother.hive.place.id %}">{{ mother.hive.place.name }}</a></td>
+            {% else %}
+                <td>{{ mother.hive.place.name }} (zrušené)</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>Číslo úlu</td>
+            {% if mother.hive.active == True %}
+                <td><a href="{% url 'visits' mother.hive.id %}">{{ mother.hive.number }}</td>
+            {% else %}
+                <td>{{ mother.hive.number }} (Zrušené)</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>Mateřská linie</td>
+            <td>{{ mother.female_line }}</td>
+        </tr>
+        <tr>
+            <td>Komentář</td>
+            <td>{{ mother.comment }}</td>
+        </tr>
+        <tr>
+            <td>Předci:</td>
+            <td>
+                {% for ancestor in ancestors %}
+                    <a href="{% url 'mothers' ancestor.id %}">{{ ancestor.mark }}({{ ancestor.year }})</a>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Potomci:</td>
+            <td>
+                {% for descendant in descendants %}
+                    <a href="{% url 'mothers' descendant.id %}">{{ descendant.mark }}({{ descendant.year }})</a>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Sestry:</td>
+            <td>
+                {% for sister in sisters %}
+                    <a href="{% url 'mothers' sister.id %}">{{ sister.mark }}({{ sister.year }})</a>
+                {% endfor %}
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,66 @@
+<!-- hives_places_table.html -->
+{% load custom_filters %}
+<table class="table basic-table">
+    <thead>
+        <tr>
+            <th>Název<br>
+                <span style="font-weight: normal">(lokace)</span>
+            </th>
+            <th>Poznámka</th>
+            <th>Včelstev<br>/ matek</th>
+            <th>Typ<br>stanoviště</th>
+            <th>Průměrný <br> medný výnos</th>
+            <th>Průměrná <br> kondice</th>
+            <th>Průměrný <br> spad</th>
+            <th>Poslední  <br> prohlídka</th>
+            <th>Poslední provedený úkon</th>
+            <th>Léčivo</th>
+            <th colspan="3"><a href="{% url 'add_hives_place' %}">Založit nové stanoviště.</a></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hives_place in hives_places %}
+            <tr>
+                <th scope="row">{{ hives_place.name }}
+                    {% if hives_place.location %}
+                        <br>
+                        <span style="font-weight: normal">({{ hives_place.location }})</span>
+                    {% endif %}
+                </th>
+                <td>{{ hives_place.comment }}</td>
+                <td>{{ hives_places_dict|get_name:hives_place.name }}
+                    /
+                    {% if mothers_count_dict|get_name:hives_place.name is not None %}
+                        {{ mothers_count_dict|get_name:hives_place.name }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </td>
+                <td>{{ hives_place.type }}</td>
+                <td>{{ avg_honey_yield_dict|get_name:hives_place.name|default:"N/A"|floatformat:1 }} kg</td>
+                <td>{{ avg_condition_dict|get_name:hives_place.name|default:"N/A"|floatformat:1 }}</td>
+                <td>
+                    {{ mite_drop_dict|get_name:hives_place.name }}
+                </td>
+                <td>{{ last_visit_date|get_name:hives_place.name|date:"d. m. Y" }}</td>
+                <td class="left-aligned-column">
+                    {% for task in tasks_dict|get_name:hives_place.name %}
+                        {{ task }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ medical_application_dict|get_name:hives_place.name }}
+                    <br>
+                    ({{ medical_application_date_dict|get_name:hives_place.name|date:"d. m. Y" }})
+                </td>
+                <td><a href="{% url 'hives_place' hives_place.id %}">Zobrazit</a></td>
+                <td><a href="{% url 'remove_hives_place' hives_place.id %}"
+                        onclick="return confirmDelete({{ hives_places_dict|get_name:hives_place.name }},
+                        'Chystáte se odstranit stanoviště i se včelstvy. Pokud chcete včelstva zachovat, nejprve je přemístěte na jiné stanoviště.')">
+                        Smazat
+                </a></td>
+                <td><a href="{% url 'edit_hives_place' hives_place.id %}">Editovat</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

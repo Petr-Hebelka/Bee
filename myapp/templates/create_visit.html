@@ -1,0 +1,38 @@
+<!-- create_visit.html -->
+
+{% extends "home.html" %}
+
+{% block content %}
+<table class="hive-description">
+    <tbody>
+        <tr>
+            <td>Včelstvo č.:</td>
+            <td>{{ user_hive.number }}</td>
+        </tr>
+        <tr>
+            <td>Stanoviště:</td>
+            <td><a href="{% url 'hives_place' user_hive.place.id %}">{{ user_hive.place.name }}</td>
+        </tr>
+        <tr>
+            <td>Matka:</td>
+            {% with mother=user_hive.mother.first %}
+                {% if mother %}
+                    <td><a href="{% url 'mothers' mother.id %}">{{ mother.mark }} ({{ mother.year }})</a></td>
+                {% else %}
+                    <td><a href="{% url 'add_mother' user_hive.id %}">Přidat matku</a></td>
+                {% endif %}
+            {% endwith %}
+        </tr>
+    </tbody>
+</table>
+{% if visit_instance %}
+    <h2>Editace prohlídky:</h2>
+{% else %}
+  <h2>Zápis prohlídky:</h2>
+{% endif %}
+  <form method="post" id="add-visit-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Uložit</button>
+  </form>
+{% endblock %}

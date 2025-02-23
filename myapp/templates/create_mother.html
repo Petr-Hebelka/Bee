@@ -1,0 +1,18 @@
+<!-- create_mother.html -->
+
+{% extends "home.html" %}
+
+{% block content %}
+
+  {% if selected_mother %}
+    <h2>Změna údajů o matce {{ selected_mother.mark }}:</h2>
+  {% else %}
+    <h2>Přidání matky:</h2>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Uložit</button>
+  </form>
+{% endblock %}

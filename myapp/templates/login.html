@@ -1,0 +1,13 @@
+{% extends "home.html" %}
+
+{% block content %}
+
+  <div style="text-align: center">
+    <h2>Přihlášení:</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Přihlásit se</button>
+    </form>
+  </div>
+{% endblock %}

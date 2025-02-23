@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="cz">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    {% load static %}
+    <script src="{% static 'scripts.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'bee_note_css.css' %}">
+</head>
+    <body>
+        <!-- Horní pruh -->
+        <div class="full-width-div">
+            <a href="{% url 'index' %}">BEE-NOTE.info:   </a>
+                Elektronický deník pro zápis a zobrazení dat o chovaných včelstev.
+        </div>
+
+        <!-- Akce uživatelského účtu -->
+        <div class="account-div bg-color full-width-div">
+            {% if request.user.is_authenticated %}
+                <div>Přihlášený uživatel: <a href="{% url 'overview' %}">{{ user.username }}</a></div>
+                <div><a href="{% url 'logout_user' %}">Odhlásit</a></div>
+            {% else %}
+                <div><a href="{% url 'login_user' %}">Přihlášení včelaře.</a></div>
+                <div><a href="{% url 'signup' %}">Registrace nového včelaře.</a></div>
+            {% endif %}
+        </div>
+
+        <!-- Systémové zprávy o akcích a chybách -->
+        <div class="messages">
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Prostor pro zobrazovaný obsah -->
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div class="full-width-div bottom-div">
+            Petr Hebelka © 2025
+        </div>
+    </body>
+</html>

@@ -1,0 +1,121 @@
+<!-- hives_table.html -->
+{% load custom_filters %}
+
+<form method="post" action="{% url 'move_hive' hives_place_id %}">
+    <input type="hidden" name="old_hives_place" value="{{ hives_place_id }}">
+    {% csrf_token %}
+    <table class="table basic-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Číslo - typ úlu</th>
+                <th>Komentář</th>
+                <th>Matka</th>
+                <th>Velikost</th>
+                <th>Kondice</th>
+                <th>Prohlídka</th>
+                <th>Medný výnos</th>
+                <th>Spad</th>
+                <th>Léčivo</th>
+                <th>Nemoci</th>
+                <th>Poslední poznámka</th>
+                <th colspan="2"><a href="{% url 'add_hive' hives_place_id %}">Založit včelstvo</a></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hive in hives %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selected_hives" value="{{ hive.id }}">
+                        {{ current_hives_place }}
+                    </td>
+                    <td>{{ hive.number }} - {{ hive.type }}</td>
+                    <td>{{ hive.comment }}</td>
+
+                    {# Přidání sloupce pro hodnotu 'mark' z tabulky 'Mother' #}
+                    {% if mothers_dict|get_name:hive.id is None %}
+                        <td><a href="{% url 'add_mother' hive.id %}">Přidat matku</a></td>
+                    {% else %}
+                        <td><a href="{% url 'mothers' mothers_dict|get_name:hive.id %}">
+                            {{hives_dict|get_name:hive.id }}<br>({{years_dict|get_name:hive.id }})
+                        </a></td>
+                    {% endif %}
+
+                    <td>
+                        {# Velikost úlu ve formátu hive_body_size + honey_supers_size z tabulky 'Visits' #}
+                        {% if hive_size|get_name:hive.id is not None %}
+                            {{ hive_size|get_name:hive.id }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if hive_condition|get_name:hive.id %}
+                            {{ hive_condition|get_name:hive.id }}
+                        {% endif %}
+                    </td>
+                    <td>{{ last_visits_date|get_name:hive.id|date:"d. m. Y" }}</td>
+                    <td>
+                        {% with hive_data=last_honey_yield_dict|get_name:hive.id %}
+                            {% if hive_data.value %}
+                                {{ hive_data.value|default:"-"|floatformat:1 }} kg
+                            {% endif %}
+                            {% if hive_data.date %}
+                                <div class="small-text">({{ hive_data.date|date:"d. m. Y" }})</div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% with hive_data=last_mite_drop_dict|get_name:hive.id %}
+                            {% if hive_data.value %}
+                                {{ hive_data.value }}
+                            {% endif %}
+                            {% if hive_data.date %}
+                                <div class="small-text">({{ hive_data.date|date:"d. m. Y" }})</div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% with hive_data=last_medication_application_dict|get_name:hive.id %}
+                            {% if hive_data.value %}
+                                {{ hive_data.value }}
+                            {% endif %}
+                            {% if hive_data.date %}
+                                <div class="small-text">({{ hive_data.date|date:"d. m. Y" }})</div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% with hive_data=last_disease_dict|get_name:hive.id %}
+                            {% if hive_data.value %}
+                                {{ hive_data.value }}
+                            {% endif %}
+                            {% if hive_data.date %}
+                                <div class="small-text">({{ hive_data.date|date:"d. m. Y" }})</div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% with hive_data=last_comment_dict|get_name:hive.id %}
+                            {% if hive_data.value %}
+                                {{ hive_data.value }}
+                            {% endif %}
+                            {% if hive_data.date %}
+                                <div class="small-text">({{ hive_data.date|date:"d. m. Y" }})</div>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <a href="{% url 'add_visit' hive.id %}">Zapsat prohlídku</a>
+                        <br>
+                        <a href="{% url 'visits' hive.id %}">Zobrazit prohlídky</a>
+                    </td>
+                    <td><a href="{% url 'remove_hive' hive.id %}" onclick="return confirmDelete(1,'Včelstvo bude zrušeno včetně matky, která poté nebude dostupná. Pokud ji chcete dále používat, nejprve ji přemístěte do volného včelstva.')">
+                        Zrušit včelstvo
+                    </a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <label for="new_hives_place">Vyberte nové stanoviště:{{ form.new_hives_place }}</label>
+
+    <button type="submit">Přemístit vybraná včelstva</button>
+</form>

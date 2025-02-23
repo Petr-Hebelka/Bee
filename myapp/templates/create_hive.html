@@ -1,0 +1,13 @@
+<!-- create_hive.html -->
+
+{% extends "home.html" %}
+
+{% block content %}
+
+  <h2>Založení včelstva:</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Uložit</button>
+  </form>
+{% endblock %}
